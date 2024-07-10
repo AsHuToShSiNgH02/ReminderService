@@ -1,29 +1,30 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const { PORT } = require('./config/serverConfig');
 
-const {PORT} = require('./config/serverConfig');
 // const { sendBasicEmail } = require('./services/email-service');
-var cron = require('node-cron');
+const TicketController = require('./controller/ticket-controller');
+
+const jobs = require('./util/job');
 
 const setupAndStartServer = () => {
     const app = express();
-    app.use(bodyParser.urlencoded({ extended: true }))
-    app.use(bodyParser.json())
+    app.use(bodyParser.json());
+    app.use(bodyParser.urlencoded({extended: true}));
+
+    app.post('/api/v1/tickets', TicketController.create);
 
     app.listen(PORT, () => {
-        console.log(`server started at ${PORT}`);
-
+        console.log(`Server started at port ${PORT}`);
+        jobs();
         // sendBasicEmail(
-        //     'dummy.232002@gmail.com',
-        //     'ashutoshin7499@gmail.com',
-        //     'demo subject',
-        //     'demo content'
+        //     'support@admin.com',
+        //     'moviebookingappservice@gmail.com',
+        //     'This is a testing email',
+        //     'Hey, how are you, I hope you like the support'
         // );
-        cron.schedule('*/1 * * * *', () => {
-            console.log('running every minute');
-          });
-    });
 
+    });
 }
 
 setupAndStartServer();
